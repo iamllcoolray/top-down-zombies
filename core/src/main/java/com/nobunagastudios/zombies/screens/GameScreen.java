@@ -3,11 +3,10 @@ package com.nobunagastudios.zombies.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.nobunagastudios.zombies.GameApplication;
@@ -16,10 +15,9 @@ import com.nobunagastudios.zombies.gamelogic.Player;
 public class GameScreen implements Screen {
     private GameApplication game;
     private Viewport viewport;
-    private OrthographicCamera camera;
     private Player player;
-    private Texture backgroundSprite;
-    private  Texture playerSprite;
+    private Texture backgroundTexture;
+    private Sprite playerSprite;
     private Vector2 playerPosition;
 
     public GameScreen(GameApplication game) {
@@ -28,9 +26,8 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-        backgroundSprite = new Texture("sprites/background.png");
-        viewport = new FitViewport(backgroundSprite.getWidth(), backgroundSprite.getHeight());
-        camera = new OrthographicCamera(viewport.getWorldWidth(), viewport.getWorldHeight());
+        backgroundTexture = new Texture("sprites/background.png");
+        viewport = new FitViewport(backgroundTexture.getWidth(), backgroundTexture.getHeight());
         player = new Player(viewport);
         playerPosition = player.getPlayerPosition();
         playerSprite = player.getPlayerSprite();
@@ -42,12 +39,14 @@ public class GameScreen implements Screen {
         viewport.apply();
 
         player.update(delta);
+        playerSprite.setPosition(playerPosition.x - (playerSprite.getWidth() / 2), playerPosition.y - (playerSprite.getHeight() / 2));
+        playerSprite.setRotation(player.getPlayerRotationAngle());
 
         game.spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
         game.spriteBatch.begin();
 
-        game.spriteBatch.draw(backgroundSprite, 0, 0);
-        game.spriteBatch.draw(playerSprite, playerPosition.x - (playerSprite.getWidth() / 2), playerPosition.y - (playerSprite.getHeight() / 2));
+        game.spriteBatch.draw(backgroundTexture, 0, 0);
+        playerSprite.draw(game.spriteBatch);
 
         game.spriteBatch.end();
     }
@@ -75,6 +74,6 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         game.spriteBatch.dispose();
-        backgroundSprite.dispose();
+        backgroundTexture.dispose();
     }
 }
